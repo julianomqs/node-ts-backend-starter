@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  server:
+    build: .
+    command: sh command.sh
+    env_file: .env
+    healthcheck:
+      test: curl -f http://localhost:3000/.well-known/apollo/server-health || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    init: true
+    ports:
+      - "${SERVER_PORT}:3000"
+      - "${SERVER_DEBUG_PORT}:9229"
+    restart: on-failure
+    user: node
+    volumes:
+      - .:/home/node/app
+      - ./.git:/home/node/app/.git
+      - npm_cache_server:/home/node/.npm
+    working_dir: /home/node/app
+
+volumes:
+  npm_cache_server:
